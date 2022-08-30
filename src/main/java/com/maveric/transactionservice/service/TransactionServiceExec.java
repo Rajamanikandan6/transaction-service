@@ -41,6 +41,7 @@ public class TransactionServiceExec implements TransactionService{
         return toDto(transactionResult);
     }
 
+
     @Override
     public TransactionDto getTransactionById(String transactionId) {
         Transaction transactionResult=repository.findById(transactionId).orElseThrow(() -> new TransactionNotFoundException("Transaction not found"));
@@ -49,6 +50,7 @@ public class TransactionServiceExec implements TransactionService{
 
     @Override
     public String deleteTransaction(String transactionId) {
-        return null;
+        repository.deleteById(transactionId);
+        return "Transaction deleted successfully.";
     }
 }
