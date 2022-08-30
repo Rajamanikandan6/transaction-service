@@ -20,7 +20,6 @@ public class TransactionServiceExec implements TransactionService{
     @Autowired
     TransactionRepository repository;
 
-
     @Override
     public List<TransactionDto> getTransactions() {
         List<Transaction> list= repository.findAll();
