@@ -9,7 +9,9 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.maveric.transactionservice.constants.Constants.getCurrentDateTime;
 import static com.maveric.transactionservice.util.ModelDtoTransformer.toDto;
+import static com.maveric.transactionservice.util.ModelDtoTransformer.toEntity;
 
 @Service
 public class TransactionServiceExec implements TransactionService{
@@ -30,8 +32,12 @@ public class TransactionServiceExec implements TransactionService{
     }
 
     @Override
-    public TransactionDto createTransaction(TransactionDto transaction) {
-        return null;
+    public TransactionDto createTransaction(TransactionDto transactionDto) {
+
+        transactionDto.setCreatedAt(getCurrentDateTime());
+        Transaction transaction = toEntity(transactionDto);
+        Transaction transactionResult = repository.save(transaction);
+        return toDto(transactionResult);
     }
 
     @Override

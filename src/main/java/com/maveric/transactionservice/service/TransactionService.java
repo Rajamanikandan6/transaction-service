@@ -9,6 +9,4 @@ public interface TransactionService {
     public TransactionDto createTransaction(TransactionDto transaction);
     public TransactionDto getTransactionById(String transactionId);
     public String deleteTransaction(String transactionId);
-
-
 }
