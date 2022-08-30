@@ -1,6 +1,7 @@
 package com.maveric.transactionservice.service;
 
 import com.maveric.transactionservice.dto.TransactionDto;
+import com.maveric.transactionservice.exception.TransactionNotFoundException;
 import com.maveric.transactionservice.model.Transaction;
 import com.maveric.transactionservice.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +43,8 @@ public class TransactionServiceExec implements TransactionService{
 
     @Override
     public TransactionDto getTransactionById(String transactionId) {
-        return null;
+        Transaction transactionResult=repository.findById(transactionId).orElseThrow(() -> new TransactionNotFoundException("Transaction not found"));
+        return toDto(transactionResult);
     }
 
     @Override
