@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.maveric.transactionservice.constants.Constants.TRANSACTION_NOT_FOUND_MESSAGE;
 import static com.maveric.transactionservice.constants.Constants.getCurrentDateTime;
 import static com.maveric.transactionservice.util.ModelDtoTransformer.toDto;
 import static com.maveric.transactionservice.util.ModelDtoTransformer.toEntity;
@@ -49,6 +50,9 @@ public class TransactionServiceExec implements TransactionService {
 
     @Override
     public String deleteTransaction(String transactionId) {
+        if(!repository.findById(transactionId).isPresent()){
+            throw new TransactionNotFoundException(TRANSACTION_NOT_FOUND_MESSAGE+transactionId);
+        }
         repository.deleteById(transactionId);
         return "Transaction deleted successfully.";
     }

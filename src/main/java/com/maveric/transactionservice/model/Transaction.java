@@ -17,6 +17,6 @@ public class Transaction {
     private String _id;
     private String accountId;
     private String type;
-    private Number amount;
+    private String amount;
     private String createdAt;
 }
