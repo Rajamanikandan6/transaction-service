@@ -2,15 +2,11 @@ package com.maveric.transactionservice.exception;
 
 import com.maveric.transactionservice.dto.ErrorDto;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import static com.maveric.transactionservice.constants.Constants.*;
 
@@ -31,15 +27,9 @@ public class ExceptionControllerAdvisor {
     public ErrorDto handleValidationExceptions(
             MethodArgumentNotValidException ex) {
         ErrorDto errorDto = new ErrorDto();
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach(error -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
-        });
+       // Map<String, String> errors = new HashMap<>();
         errorDto.setCode(BAD_REQUEST_CODE);
-        errorDto.setMessage(BAD_REQUEST_MESSAGE);
-        errorDto.setErrors(errors);
+        errorDto.setMessage(ex.getBindingResult().getAllErrors().get(0).getDefaultMessage());
         return errorDto;
     }
 

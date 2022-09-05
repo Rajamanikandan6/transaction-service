@@ -2,9 +2,13 @@ package com.maveric.transactionservice.service;
 
 import com.maveric.transactionservice.dto.TransactionDto;
 import com.maveric.transactionservice.exception.TransactionNotFoundException;
+import com.maveric.transactionservice.mapper.TransactionMapper;
 import com.maveric.transactionservice.model.Transaction;
 import com.maveric.transactionservice.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -21,17 +25,19 @@ public class TransactionServiceExec implements TransactionService {
 
    @Autowired
    TransactionRepository repository;
+    @Autowired
+    private TransactionMapper mapper;
 
     @Override
-    public List<TransactionDto> getTransactions() {
-        List <Transaction> list= repository.findAll();
-        List<TransactionDto> listDto = new ArrayList<TransactionDto>(list.size());
-
-        for(Transaction transaction:list)
-        {
-            listDto.add(toDto(transaction));
+    public List<TransactionDto> getTransactions(Integer page, Integer pageSize) {
+        Pageable paging = PageRequest.of(page, pageSize);
+        Page<Transaction> pageResult = repository.findAll(paging);
+        if(pageResult.hasContent()) {
+            List<Transaction> transaction = pageResult.getContent();
+            return mapper.mapToDto(transaction);
+        } else {
+            return new ArrayList<>();
         }
-        return listDto;  //Check for loop
     }
 
     @Override
@@ -55,5 +61,10 @@ public class TransactionServiceExec implements TransactionService {
         }
         repository.deleteById(transactionId);
         return "Transaction deleted successfully.";
+    }
+    @Override
+    public List<TransactionDto> getTransactionsByAccountId(String accountId) {
+        List<Transaction> transactions = repository.findByAccountId(accountId);
+        return mapper.mapToDto(transactions);
     }
 }

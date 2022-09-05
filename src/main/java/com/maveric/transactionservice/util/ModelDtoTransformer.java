@@ -5,6 +5,9 @@ import com.maveric.transactionservice.model.Transaction;
 
 
 public class ModelDtoTransformer {
+    private ModelDtoTransformer(){
+
+    }
 
     public static Transaction toEntity(TransactionDto dto) {
         return new Transaction(

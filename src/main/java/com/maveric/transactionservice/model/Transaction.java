@@ -1,14 +1,13 @@
 package com.maveric.transactionservice.model;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import com.maveric.transactionservice.constants.Type;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
 @NoArgsConstructor
+@Builder
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 @Document(collection = "Transaction")
 public class Transaction {
@@ -16,7 +15,7 @@ public class Transaction {
     @Id
     private String _id;
     private String accountId;
-    private String type;
-    private String amount;
+    private Type type;
+    private Number amount;
     private String createdAt;
 }

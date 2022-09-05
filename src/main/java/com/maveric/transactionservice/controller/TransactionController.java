@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -18,12 +19,12 @@ public class TransactionController {
     @GetMapping("accounts/{accountId}/transactions")
     public ResponseEntity<List<TransactionDto>> getTransactions(@PathVariable String accountId, @RequestParam(defaultValue = "0") Integer page,
                                                                 @RequestParam(defaultValue = "10") Integer pageSize) {
-        List<TransactionDto> transactionDtoResponse = transactionService.getTransactions();
+        List<TransactionDto> transactionDtoResponse = transactionService.getTransactions(page,pageSize);
         return new ResponseEntity<List<TransactionDto>>(transactionDtoResponse, HttpStatus.OK);
     }
 
     @PostMapping("accounts/{accountId}/transactions")
-    public ResponseEntity<TransactionDto> createTransaction(@PathVariable String accountId, @RequestBody TransactionDto transactionDto) {
+    public ResponseEntity<TransactionDto> createTransaction(@PathVariable String accountId, @Valid @RequestBody TransactionDto transactionDto) {
         TransactionDto transactionDtoResponse = transactionService.createTransaction(transactionDto);
         return new ResponseEntity<TransactionDto>(transactionDtoResponse, HttpStatus.OK);
     }
@@ -38,5 +39,10 @@ public class TransactionController {
     public ResponseEntity<String> deleteTransaction(@PathVariable String accountId,@PathVariable String transactionId) {
         String result = transactionService.deleteTransaction(transactionId);
         return new ResponseEntity<String>(result, HttpStatus.OK);
+    }
+    @GetMapping("accounts/{accountId}/transaction")
+    public ResponseEntity<List<TransactionDto>> getTransactionsByAccountId(@PathVariable String accountId)  {
+        List<TransactionDto> transactionDtoResponse = transactionService.getTransactionsByAccountId(accountId);
+        return new ResponseEntity<>(transactionDtoResponse, HttpStatus.OK);
     }
 }
