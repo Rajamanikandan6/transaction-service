@@ -27,7 +27,6 @@ public class ExceptionControllerAdvisor {
     public ErrorDto handleValidationExceptions(
             MethodArgumentNotValidException ex) {
         ErrorDto errorDto = new ErrorDto();
-       // Map<String, String> errors = new HashMap<>();
         errorDto.setCode(BAD_REQUEST_CODE);
         errorDto.setMessage(ex.getBindingResult().getAllErrors().get(0).getDefaultMessage());
         return errorDto;
