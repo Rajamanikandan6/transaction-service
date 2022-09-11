@@ -2,6 +2,7 @@ package com.maveric.transactionservice.service;
 
 import com.maveric.transactionservice.constants.Type;
 import com.maveric.transactionservice.dto.TransactionDto;
+import com.maveric.transactionservice.exception.TransactionNotFoundException;
 import com.maveric.transactionservice.mapper.TransactionMapperImpl;
 import com.maveric.transactionservice.model.Transaction;
 import com.maveric.transactionservice.repository.TransactionRepository;
@@ -22,8 +23,7 @@ import java.util.Optional;
 
 import static com.maveric.transactionservice.TransactionServiceApplicationTests.getTransaction;
 import static com.maveric.transactionservice.TransactionServiceApplicationTests.getTransactionDto;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertSame;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.when;
@@ -69,6 +69,8 @@ public class TransactionServiceTest {
         assertEquals(Type.CREDIT, transactions.get(1).getType());
     }
 
+
+
     @Test
     public void testGetTransactionById() {
         when(repository.findById("123")).thenReturn(Optional.of(getTransaction()));
@@ -77,6 +79,12 @@ public class TransactionServiceTest {
         TransactionDto transactionDto = service.getTransactionById("123");
 
         assertSame(transactionDto.getType(),getTransactionDto().getType());
+    }
+
+    @Test(expected = TransactionNotFoundException.class)
+    public void testGetTransactionByIdForInvalidId() {
+
+        TransactionDto transactionDto = service.getTransactionById(" ");
     }
 
     @Test
@@ -91,6 +99,13 @@ public class TransactionServiceTest {
     }
 
     @Test
+    public void testGetTransactionForInvalidAccountId() {
+        List<TransactionDto> transactionDto = service.getTransactionsByAccountId(" ");
+        assertTrue(transactionDto.isEmpty());
+    }
+
+
+    @Test
     public void testDeleteTransactionById() {
 
         when(repository.findById("123")).thenReturn(Optional.of(getTransaction()));
@@ -99,5 +114,10 @@ public class TransactionServiceTest {
         String transactionDto = service.deleteTransaction("123");
 
         assertSame( "Transaction deleted successfully.",transactionDto);
+    }
+
+    @Test(expected = TransactionNotFoundException.class)
+    public void testDeleteTransactionByIdForInvalidId() {
+        String transactionDto = service.deleteTransaction(" ");
     }
 }

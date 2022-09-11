@@ -1,5 +1,6 @@
 package com.maveric.transactionservice.exception;
 
+
 import com.maveric.transactionservice.dto.ErrorDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
