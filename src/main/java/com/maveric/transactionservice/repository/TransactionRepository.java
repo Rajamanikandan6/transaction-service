@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface TransactionRepository extends MongoRepository<Transaction,String> {
     List<Transaction> findByAccountId(String accountId);
+    void deleteByIdIn(List<String> ids);
+
 }

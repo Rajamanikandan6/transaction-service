@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.maveric.transactionservice.constants.Constants.TRANSACTION_NOT_FOUND_MESSAGE;
 import static com.maveric.transactionservice.constants.Constants.getCurrentDateTime;
@@ -67,4 +68,15 @@ public class TransactionServiceExec implements TransactionService {
         List<Transaction> transactions = repository.findByAccountId(accountId);
         return mapper.mapToDto(transactions);
     }
+    @Override
+    public String deleteAllTransaction(String accountId) {
+        List<Transaction> transactions=repository.findByAccountId(accountId);
+//        for(Transaction tr : transactions){
+//            repository.deleteById(tr.get_id());
+//        }
+        List <String> trList = transactions.stream().map(t-> t.get_id()).collect(Collectors.toList());
+        repository.deleteByIdIn(trList);
+        return "Transaction deleted successfully.";
+    }
+
 }

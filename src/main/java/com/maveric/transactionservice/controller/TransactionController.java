@@ -1,6 +1,8 @@
 package com.maveric.transactionservice.controller;
 
+import com.maveric.transactionservice.dto.Balance;
 import com.maveric.transactionservice.dto.TransactionDto;
+import com.maveric.transactionservice.feignconsumer.BalanceServiceConsumer;
 import com.maveric.transactionservice.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,6 +18,9 @@ public class TransactionController {
     @Autowired
     TransactionService transactionService;
 
+    @Autowired
+    BalanceServiceConsumer balanceServiceConsumer;
+
     @GetMapping("accounts/{accountId}/transactions")
     public ResponseEntity<List<TransactionDto>> getTransactions(@PathVariable String accountId, @RequestParam(defaultValue = "0") Integer page,
                                                                 @RequestParam(defaultValue = "10") Integer pageSize) {
@@ -26,11 +31,16 @@ public class TransactionController {
     @PostMapping("accounts/{accountId}/transactions")
     public ResponseEntity<TransactionDto> createTransaction(@Valid @RequestBody TransactionDto transactionDto) {
         TransactionDto transactionDtoResponse = transactionService.createTransaction(transactionDto);
+        List<Balance> balances =
+        balanceServiceConsumer.getAllBalance(transactionDto.getAccountId(), 1,1);
+        Balance newBalance=balances.get(0);
+        balanceServiceConsumer.updateBalanceDetails(newBalance , newBalance.getAccountId(), newBalance.getId());
+
         return new ResponseEntity<TransactionDto>(transactionDtoResponse, HttpStatus.OK);
     }
 
     @GetMapping("accounts/{accountId}/transactions/{transactionId}")
-    public ResponseEntity<TransactionDto> getTransactionDetails(@PathVariable String accountId,@PathVariable String transactionId) {
+    public ResponseEntity<TransactionDto> getTransactionDetails(@PathVariable String accountId,@PathVariable String transactionId,@RequestHeader(value = "userId") String userId) {
         TransactionDto transactionDtoResponse = transactionService.getTransactionById(transactionId);
         return new ResponseEntity<TransactionDto>(transactionDtoResponse, HttpStatus.OK);
     }
@@ -38,6 +48,11 @@ public class TransactionController {
     @DeleteMapping("accounts/{accountId}/transactions/{transactionId}")
     public ResponseEntity<String> deleteTransaction(@PathVariable String accountId,@PathVariable String transactionId) {
         String result = transactionService.deleteTransaction(transactionId);
+        return new ResponseEntity<String>(result, HttpStatus.OK);
+    }
+    @DeleteMapping("accounts/{accountId}/transactions")
+    public ResponseEntity<String> deleteAllTransaction(@PathVariable String accountId) {
+        String result = transactionService.deleteAllTransaction(accountId);
         return new ResponseEntity<String>(result, HttpStatus.OK);
     }
     @GetMapping("accounts/{accountId}/transaction")
