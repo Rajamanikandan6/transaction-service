@@ -3,6 +3,8 @@ package com.maveric.transactionservice.exception;
 
 import com.maveric.transactionservice.dto.ErrorDto;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -33,13 +35,38 @@ public class ExceptionControllerAdvisor {
         return errorDto;
     }
 
-    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
-    public ErrorDto handleHttpRequestMethodNotSupportedException(
-            HttpRequestMethodNotSupportedException ex) {
+    @ExceptionHandler(BalanceInsufficientException.class)
+    public ErrorDto handleInsufficientException(
+            BalanceInsufficientException balanceInsufficientException) {
         ErrorDto errorDto = new ErrorDto();
-        errorDto.setCode(METHOD_NOT_ALLOWED_CODE);
-        errorDto.setMessage(METHOD_NOT_ALLOWED_MESSAGE);
+        errorDto.setCode(String.valueOf(HttpStatus.BAD_REQUEST));
+        errorDto.setMessage(balanceInsufficientException.getMessage());
         return errorDto;
     }
+
+    @ExceptionHandler(AccountIDMismatch.class)
+    public ErrorDto handleAccountMismatchException(AccountIDMismatch accountIDMismatch) {
+        ErrorDto errorDto = new ErrorDto();
+        errorDto.setCode(String.valueOf(HttpStatus.BAD_REQUEST));
+        errorDto.setMessage(accountIDMismatch.getMessage());
+        return errorDto;
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ErrorDto handleTypeException() {
+        ErrorDto errorDto = new ErrorDto();
+        errorDto.setCode(String.valueOf(HttpStatus.BAD_REQUEST));
+        errorDto.setMessage(TYPE_ERROR);
+        return errorDto;
+    }
+
+//    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+//    @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+//    public ErrorDto handleHttpRequestMethodNotSupportedException(
+//            HttpRequestMethodNotSupportedException ex) {
+//        ErrorDto errorDto = new ErrorDto();
+//        errorDto.setCode(METHOD_NOT_ALLOWED_CODE);
+//        errorDto.setMessage(METHOD_NOT_ALLOWED_MESSAGE);
+//        return errorDto;
+//    }
 }

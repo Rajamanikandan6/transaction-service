@@ -17,7 +17,7 @@ public interface BalanceServiceConsumer {
 
 
     @PutMapping("/accounts/{accountId}/balances/{balanceId}")
-    Balance updateBalance(@RequestBody Balance balance, @PathVariable String accountId, @PathVariable String balanceId);
+    Balance updateBalance(@RequestBody Balance balance, @PathVariable String accountId, @PathVariable String balanceId,@RequestHeader(value = "userId") String userId);
     @GetMapping("accounts/{accountId}/balances/accountBalance")
-    Balance getBalanceAccountDetails(@PathVariable String accountId);
+    Balance getBalanceAccountDetails(@PathVariable String accountId,@RequestHeader(value = "userId") String userId);
 }

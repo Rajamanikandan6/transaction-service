@@ -3,6 +3,8 @@ package com.maveric.transactionservice.controller;
 import com.maveric.transactionservice.constants.Type;
 import com.maveric.transactionservice.dto.Balance;
 import com.maveric.transactionservice.dto.TransactionDto;
+import com.maveric.transactionservice.exception.AccountIDMismatch;
+import com.maveric.transactionservice.exception.BalanceInsufficientException;
 import com.maveric.transactionservice.feignconsumer.BalanceServiceConsumer;
 import com.maveric.transactionservice.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
+import static com.maveric.transactionservice.constants.Constants.ACCOUNT_ID_ERROR;
 import static com.maveric.transactionservice.constants.Constants.INSUFFICIENT_BALANCE_MESSAGE;
 
 @RestController
@@ -32,27 +35,30 @@ public class TransactionController {
     }
 
     @PostMapping("accounts/{accountId}/transactions")
-    public ResponseEntity<TransactionDto> createTransaction(@Valid @RequestBody TransactionDto transactionDto) throws Exception {
+    public ResponseEntity<TransactionDto> createTransaction(@Valid @RequestBody TransactionDto transactionDto,@PathVariable String accountId, @RequestHeader(value = "userId") String userId) throws Exception {
 
+        if(transactionDto.getAccountId().equals(accountId)) {
 
-
-        Balance balances = balanceServiceConsumer.getBalanceAccountDetails(transactionDto.getAccountId());
-        int newAmount ;
-        int amount= Integer.parseInt(balances.getAmount());
-        if(transactionDto.getType() == Type.DEBIT){
-            if(((Integer) transactionDto.getAmount()) < amount){
-                newAmount=(Integer)transactionDto.getAmount() - amount;
-            }else{
-                throw new Exception(INSUFFICIENT_BALANCE_MESSAGE);
+            Balance balances = balanceServiceConsumer.getBalanceAccountDetails(transactionDto.getAccountId(), userId);
+            int newAmount;
+            int amount = Integer.parseInt(balances.getAmount());
+            if (transactionDto.getType() == Type.DEBIT) {
+                if (((Integer) transactionDto.getAmount()) < amount) {
+                    newAmount = amount - (Integer) transactionDto.getAmount();
+                } else {
+                    throw new BalanceInsufficientException(INSUFFICIENT_BALANCE_MESSAGE);
+                }
+            } else {
+                newAmount = (Integer) transactionDto.getAmount() + amount;
             }
-        }else{
-            newAmount = (Integer)transactionDto.getAmount()+amount;
-        }
-        TransactionDto transactionDtoResponse = transactionService.createTransaction(transactionDto);
-        balances.setAmount(String.valueOf(newAmount));
-        balanceServiceConsumer.updateBalance(balances, transactionDto.getAccountId(), balances.getId());
+            TransactionDto transactionDtoResponse = transactionService.createTransaction(transactionDto);
+            balances.setAmount(String.valueOf(newAmount));
+            balanceServiceConsumer.updateBalance(balances, transactionDto.getAccountId(), balances.getId(), userId);
 
-        return new ResponseEntity<TransactionDto>(transactionDtoResponse, HttpStatus.OK);
+            return new ResponseEntity<TransactionDto>(transactionDtoResponse, HttpStatus.OK);
+        }else{
+            throw new AccountIDMismatch(ACCOUNT_ID_ERROR);
+        }
     }
 
     @GetMapping("accounts/{accountId}/transactions/{transactionId}")
