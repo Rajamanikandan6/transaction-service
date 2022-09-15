@@ -27,4 +27,5 @@ public class Constants {
     public static final String INCORRECT_URL_CODE="404";
     public static final String INCORRECT_URL_MESSAGE="The server can not find the requested resource.";
     public static final String BALANCE_NOT_FOUND_MESSAGE="Balance details not found for Id-";
+    public static final String INSUFFICIENT_BALANCE_MESSAGE="Insufficient Balance";
 }

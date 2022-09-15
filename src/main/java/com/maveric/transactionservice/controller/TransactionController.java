@@ -1,5 +1,6 @@
 package com.maveric.transactionservice.controller;
 
+import com.maveric.transactionservice.constants.Type;
 import com.maveric.transactionservice.dto.Balance;
 import com.maveric.transactionservice.dto.TransactionDto;
 import com.maveric.transactionservice.feignconsumer.BalanceServiceConsumer;
@@ -11,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+
+import static com.maveric.transactionservice.constants.Constants.INSUFFICIENT_BALANCE_MESSAGE;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -29,12 +32,25 @@ public class TransactionController {
     }
 
     @PostMapping("accounts/{accountId}/transactions")
-    public ResponseEntity<TransactionDto> createTransaction(@Valid @RequestBody TransactionDto transactionDto) {
+    public ResponseEntity<TransactionDto> createTransaction(@Valid @RequestBody TransactionDto transactionDto) throws Exception {
+
+
+
+        Balance balances = balanceServiceConsumer.getBalanceAccountDetails(transactionDto.getAccountId());
+        int newAmount ;
+        int amount= Integer.parseInt(balances.getAmount());
+        if(transactionDto.getType() == Type.DEBIT){
+            if(((Integer) transactionDto.getAmount()) < amount){
+                newAmount=(Integer)transactionDto.getAmount() - amount;
+            }else{
+                throw new Exception(INSUFFICIENT_BALANCE_MESSAGE);
+            }
+        }else{
+            newAmount = (Integer)transactionDto.getAmount()+amount;
+        }
         TransactionDto transactionDtoResponse = transactionService.createTransaction(transactionDto);
-        List<Balance> balances =
-        balanceServiceConsumer.getAllBalance(transactionDto.getAccountId(), 1,1);
-        Balance newBalance=balances.get(0);
-        balanceServiceConsumer.updateBalanceDetails(newBalance , newBalance.getAccountId(), newBalance.getId());
+        balances.setAmount(String.valueOf(newAmount));
+        balanceServiceConsumer.updateBalance(balances, transactionDto.getAccountId(), balances.getId());
 
         return new ResponseEntity<TransactionDto>(transactionDtoResponse, HttpStatus.OK);
     }
@@ -50,11 +66,11 @@ public class TransactionController {
         String result = transactionService.deleteTransaction(transactionId);
         return new ResponseEntity<String>(result, HttpStatus.OK);
     }
-    @DeleteMapping("accounts/{accountId}/transactions")
-    public ResponseEntity<String> deleteAllTransaction(@PathVariable String accountId) {
-        String result = transactionService.deleteAllTransaction(accountId);
-        return new ResponseEntity<String>(result, HttpStatus.OK);
-    }
+//    @DeleteMapping("accounts/{accountId}/transactions")
+//    public ResponseEntity<String> deleteAllTransaction(@PathVariable String accountId) {
+//        String result = transactionService.deleteAllTransaction(accountId);
+//        return new ResponseEntity<String>(result, HttpStatus.OK);
+//    }
     @GetMapping("accounts/{accountId}/transaction")
     public ResponseEntity<List<TransactionDto>> getTransactionsByAccountId(@PathVariable String accountId)  {
         List<TransactionDto> transactionDtoResponse = transactionService.getTransactionsByAccountId(accountId);

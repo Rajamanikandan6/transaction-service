@@ -15,4 +15,9 @@ public interface BalanceServiceConsumer {
     @GetMapping("/accounts/{accountId}/balances")
     List<Balance> getAllBalance(@PathVariable String accountId, @RequestParam int page , @RequestParam int pageSize);
 
+
+    @PutMapping("/accounts/{accountId}/balances/{balanceId}")
+    Balance updateBalance(@RequestBody Balance balance, @PathVariable String accountId, @PathVariable String balanceId);
+    @GetMapping("accounts/{accountId}/balances/accountBalance")
+    Balance getBalanceAccountDetails(@PathVariable String accountId);
 }
