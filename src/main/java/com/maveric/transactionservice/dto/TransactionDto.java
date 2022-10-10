@@ -22,4 +22,6 @@ public class TransactionDto {
     @Min(value=0,message = "Amount cannot be less than zero")
     private Number amount;
     private String createdAt;
+    //private Balance balance;
+
 }

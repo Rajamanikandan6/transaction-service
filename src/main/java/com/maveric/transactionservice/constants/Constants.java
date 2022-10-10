@@ -26,4 +26,8 @@ public class Constants {
     public static final String BAD_REQUEST_MESSAGE="Invalid inputs!";
     public static final String INCORRECT_URL_CODE="404";
     public static final String INCORRECT_URL_MESSAGE="The server can not find the requested resource.";
+    public static final String BALANCE_NOT_FOUND_MESSAGE="Balance details not found for Id-";
+    public static final String INSUFFICIENT_BALANCE_MESSAGE="Insufficient Balance";
+    public static final String TYPE_ERROR="Type should be 'CREDIT' or 'DEBIT'";
+    public static final String ACCOUNT_ID_ERROR="account id should be same in request body and url";
 }

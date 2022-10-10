@@ -18,4 +18,5 @@ public class Transaction {
     private Type type;
     private Number amount;
     private String createdAt;
+
 }

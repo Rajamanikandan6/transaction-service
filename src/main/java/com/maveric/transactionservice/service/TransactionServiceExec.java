@@ -14,8 +14,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.maveric.transactionservice.constants.Constants.TRANSACTION_NOT_FOUND_MESSAGE;
-import static com.maveric.transactionservice.constants.Constants.getCurrentDateTime;
+import static com.maveric.transactionservice.constants.Constants.*;
 import static com.maveric.transactionservice.util.ModelDtoTransformer.toDto;
 import static com.maveric.transactionservice.util.ModelDtoTransformer.toEntity;
 
@@ -42,6 +41,7 @@ public class TransactionServiceExec implements TransactionService {
 
     @Override
     public TransactionDto createTransaction(TransactionDto transactionDto) {
+
         transactionDto.setCreatedAt(getCurrentDateTime());
         Transaction transaction = toEntity(transactionDto);
         Transaction transactionResult = repository.save(transaction);
@@ -60,11 +60,19 @@ public class TransactionServiceExec implements TransactionService {
             throw new TransactionNotFoundException(TRANSACTION_NOT_FOUND_MESSAGE+transactionId);
         }
         repository.deleteById(transactionId);
-        return "Transaction deleted successfully.";
+        return TRANSACTION_DELETED_SUCCESS;
     }
     @Override
     public List<TransactionDto> getTransactionsByAccountId(String accountId) {
         List<Transaction> transactions = repository.findByAccountId(accountId);
         return mapper.mapToDto(transactions);
     }
+//    @Override
+//    public String deleteAllTransaction(String accountId) {
+//        List<Transaction> transactions=repository.findByAccountId(accountId);
+//        List <String> trList = transactions.stream().map(t-> t.get_id()).collect(Collectors.toList());
+//        repository.deleteByIdIn(trList);
+//        return TRANSACTION_DELETED_SUCCESS;
+//    }
+
 }
