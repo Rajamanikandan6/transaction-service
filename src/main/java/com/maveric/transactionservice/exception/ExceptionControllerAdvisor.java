@@ -27,21 +27,21 @@ public class ExceptionControllerAdvisor {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorDto handleValidationExceptions(
+    public ResponseEntity<ErrorDto> handleValidationExceptions(
             MethodArgumentNotValidException ex) {
         ErrorDto errorDto = new ErrorDto();
         errorDto.setCode(BAD_REQUEST_CODE);
         errorDto.setMessage(ex.getBindingResult().getAllErrors().get(0).getDefaultMessage());
-        return errorDto;
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDto);
     }
 
     @ExceptionHandler(BalanceInsufficientException.class)
-    public ErrorDto handleInsufficientException(
+    public ResponseEntity<ErrorDto> handleInsufficientException(
             BalanceInsufficientException balanceInsufficientException) {
         ErrorDto errorDto = new ErrorDto();
         errorDto.setCode(String.valueOf(HttpStatus.BAD_REQUEST));
         errorDto.setMessage(balanceInsufficientException.getMessage());
-        return errorDto;
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorDto);
     }
 
     @ExceptionHandler(AccountIDMismatch.class)
