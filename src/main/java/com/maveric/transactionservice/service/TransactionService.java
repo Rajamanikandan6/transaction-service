@@ -11,4 +11,5 @@ public interface TransactionService {
     public TransactionDto getTransactionById(String transactionId);
     public String deleteTransaction(String transactionId);
    // public  String deleteAllTransaction(String accountId);
+    public String deleteTransactionByAccountId(String accountId);
 }

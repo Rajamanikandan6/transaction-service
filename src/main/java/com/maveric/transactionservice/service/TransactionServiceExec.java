@@ -62,6 +62,13 @@ public class TransactionServiceExec implements TransactionService {
         repository.deleteById(transactionId);
         return TRANSACTION_DELETED_SUCCESS;
     }
+
+    @Override
+    public String deleteTransactionByAccountId(String accountId) {
+        repository.deleteByAccountId(accountId);
+        return TRANSACTION_DELETED_SUCCESS;
+    }
+
     @Override
     public List<TransactionDto> getTransactionsByAccountId(String accountId) {
         List<Transaction> transactions = repository.findByAccountId(accountId);
