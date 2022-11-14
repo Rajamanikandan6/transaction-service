@@ -30,4 +30,6 @@ public class Constants {
     public static final String INSUFFICIENT_BALANCE_MESSAGE="Insufficient Balance";
     public static final String TYPE_ERROR="Type should be 'CREDIT' or 'DEBIT'";
     public static final String ACCOUNT_ID_ERROR="account id should be same in request body and url";
+    public static final String UnauthorisedError="AccountId not valid or AccountId not Valid to this UserId";
+
 }

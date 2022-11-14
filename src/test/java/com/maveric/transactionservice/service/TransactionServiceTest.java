@@ -25,6 +25,7 @@ import static com.maveric.transactionservice.TransactionServiceApplicationTests.
 import static com.maveric.transactionservice.TransactionServiceApplicationTests.getTransactionDto;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.when;
 
@@ -58,12 +59,12 @@ public class TransactionServiceTest {
     @Test
     public void testGetTransactions() {
         Page<Transaction> pagedResponse = new PageImpl(Arrays.asList(getTransaction(),getTransaction()));
-        when(repository.findAll(any(Pageable.class))).thenReturn(pagedResponse);
+        when(repository.findByAccountId(any(Pageable.class),any())).thenReturn(pagedResponse);
         when(pageResult.hasContent()).thenReturn(true);
         when(pageResult.getContent()).thenReturn(Arrays.asList(getTransaction(),getTransaction()));
         when(mapper.mapToDto(any())).thenReturn(Arrays.asList(getTransactionDto(),getTransactionDto()));
 
-        List<TransactionDto> transactions = service.getTransactions(1,1);
+        List<TransactionDto> transactions = service.getTransactionsByAccountId(1,1, "1234");
 
         assertEquals("1234", transactions.get(0).getAccountId());
         assertEquals(Type.CREDIT, transactions.get(1).getType());
@@ -89,18 +90,24 @@ public class TransactionServiceTest {
 
     @Test
     public void testGetTransactionByAccountId() {
-        when(repository.findByAccountId("123")).thenReturn(Arrays.asList(getTransaction(),getTransaction()));
+        Page<Transaction> pagedResponse = new PageImpl(Arrays.asList(getTransaction(),getTransaction()));
+
+        when(repository.findByAccountId(any(),eq("1234"))).thenReturn(pagedResponse);
         when(mapper.mapToDto(any())).thenReturn(Arrays.asList(getTransactionDto(),getTransactionDto()));
 
-        List<TransactionDto> transactionDto = service.getTransactionsByAccountId("123");
+        List<TransactionDto> transactionDto = service.getTransactionsByAccountId(1, 1, "1234");
 
         assertEquals("1234", transactionDto.get(0).getAccountId());
         assertEquals(Type.CREDIT, transactionDto.get(1).getType());
     }
 
-    @Test
+    @Test(expected = NullPointerException.class)
     public void testGetTransactionForInvalidAccountId() {
-        List<TransactionDto> transactionDto = service.getTransactionsByAccountId(" ");
+        Page<Transaction> pagedResponse = new PageImpl(Arrays.asList(getTransaction(),getTransaction()));
+
+        when(repository.findByAccountId(any(),eq("123"))).thenReturn(pagedResponse);
+        when(mapper.mapToDto(any())).thenReturn(Arrays.asList(getTransactionDto(),getTransactionDto()));
+        List<TransactionDto> transactionDto = service.getTransactionsByAccountId(1, 1, "000");
         assertTrue(transactionDto.isEmpty());
     }
 
