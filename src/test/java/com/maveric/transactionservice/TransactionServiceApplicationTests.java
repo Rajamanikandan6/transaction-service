@@ -14,6 +14,7 @@ public
 class TransactionServiceApplicationTests {
 
 	public static final String apiV1 = "/api/v1/accounts/1/transactions";
+	public static final String getTransactionInvalidApiV1 = "/api/v1/accounts/0/transactions";
 	@Test
 	void testDoSomething() {assertTrue(true);
 	}

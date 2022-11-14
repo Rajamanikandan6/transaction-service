@@ -19,7 +19,7 @@ public class TransactionDto {
     @NotNull(message = "Type is mandatory - 'CREDIT' or 'DEBIT'")
     private Type type;
     @NotNull(message = "Amount is mandatory")
-    @Min(value=0,message = "Amount cannot be less than zero")
+    @Min(value=1,message = "Amount cannot be less than or equal to zero")
     private Number amount;
     private String createdAt;
     //private Balance balance;

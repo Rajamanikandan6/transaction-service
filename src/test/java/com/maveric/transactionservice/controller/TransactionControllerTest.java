@@ -15,23 +15,29 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.maveric.transactionservice.TransactionServiceApplicationTests.apiV1;
+import static com.maveric.transactionservice.TransactionServiceApplicationTests.getTransactionInvalidApiV1;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-@ContextConfiguration(classes=TransactionController.class)
+//@ContextConfiguration(classes=TransactionController.class)
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
-@WebMvcTest(TransactionController.class)
+//@WebMvcTest(TransactionController.class)
 @Tag("Integration Tests")
+@SpringBootTest
 
 public class TransactionControllerTest {
     @Autowired
@@ -48,17 +54,36 @@ public class TransactionControllerTest {
     public void shouldGetStatus200WhenRequestMadeTogetTransactions() throws Exception
     {
         mock.perform(get(apiV1)
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON).header("userId","32554364643"))
                 .andExpect(status().isOk())
                 .andDo(print());
 
     }
 
     @Test
+    public void shouldGetStatus400WhenRequestMadeTogetTransactions() throws Exception
+    {
+        mock.perform(get(getTransactionInvalidApiV1)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+
+    }
+
+
+
+    @Test
     public void shouldGetStatus200WhenRequestMadeTogetTransactionsByAccountId() throws Exception
     {
-        mock.perform(get("/api/v1/accounts/1/transaction")
-                        .contentType(MediaType.APPLICATION_JSON))
+        TransactionDto transactionDto = new TransactionDto();
+        transactionDto.setAccountId("33");
+        transactionDto.setAmount(34900);
+        transactionDto.setType(Type.CREDIT);
+        List<TransactionDto> transactions=new ArrayList<>();
+        transactions.add(transactionDto);
+        when(transactionService.getTransactionsByAccountId(any(),any(),any())).thenReturn(transactions);
+        mock.perform(get("/api/v1/accounts/33/transactions")
+                        .contentType(MediaType.APPLICATION_JSON).header("userId","32554364643"))
                 .andExpect(status().isOk())
                 .andDo(print());
     }
@@ -114,7 +139,7 @@ public class TransactionControllerTest {
     public void shouldGetStatus200WhenRequestMadeToDeleteTransaction() throws Exception
     {
         mock.perform(delete(apiV1+"/transactionId1")
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON).header("userId","32554364643"))
                 .andExpect(status().isOk())
                 .andDo(print());
     }

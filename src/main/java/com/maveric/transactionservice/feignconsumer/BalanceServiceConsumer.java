@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@FeignClient(value = "feignUser",url = "http://localhost:3015/api/v1")
+@FeignClient(value = "feignUser",url = "http://localhost:3015/api/v1") //configuration = FeignCustomErrorDecoder.class
 public interface BalanceServiceConsumer {
     @GetMapping("/accounts/{accountId}/balances/{balanceId}")
     Balance getBalanceDetails(@PathVariable String accountId , @PathVariable String balanceId);
