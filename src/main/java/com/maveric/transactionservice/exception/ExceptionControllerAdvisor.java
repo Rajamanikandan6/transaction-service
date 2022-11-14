@@ -52,6 +52,14 @@ public class ExceptionControllerAdvisor {
         return errorDto;
     }
 
+    @ExceptionHandler(UserNotAllowedException.class)
+    public ErrorDto handleUserNotAllowedException(UserNotAllowedException userNotAllowedException) {
+        ErrorDto errorDto = new ErrorDto();
+        errorDto.setCode(String.valueOf(HttpStatus.UNAUTHORIZED.value()));
+        errorDto.setMessage(userNotAllowedException.getMessage());
+        return errorDto;
+    }
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ErrorDto handleTypeException() {
         ErrorDto errorDto = new ErrorDto();

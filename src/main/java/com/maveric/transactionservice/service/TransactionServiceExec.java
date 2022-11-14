@@ -2,7 +2,9 @@ package com.maveric.transactionservice.service;
 
 import com.maveric.transactionservice.dto.TransactionDto;
 import com.maveric.transactionservice.exception.TransactionNotFoundException;
+import com.maveric.transactionservice.exception.UserNotAllowedException;
 import com.maveric.transactionservice.mapper.TransactionMapper;
+import com.maveric.transactionservice.model.Account;
 import com.maveric.transactionservice.model.Transaction;
 import com.maveric.transactionservice.repository.TransactionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.maveric.transactionservice.constants.Constants.*;
 import static com.maveric.transactionservice.util.ModelDtoTransformer.toDto;
@@ -28,9 +31,9 @@ public class TransactionServiceExec implements TransactionService {
     private TransactionMapper mapper;
 
     @Override
-    public List<TransactionDto> getTransactions(Integer page, Integer pageSize) {
+    public List<TransactionDto> getTransactionsByAccountId(Integer page, Integer pageSize,String accountId) {
         Pageable paging = PageRequest.of(page, pageSize);
-        Page<Transaction> pageResult = repository.findAll(paging);
+        Page<Transaction> pageResult = repository.findByAccountId(paging,accountId);
         if(pageResult.hasContent()) {
             List<Transaction> transaction = pageResult.getContent();
             return mapper.mapToDto(transaction);
@@ -39,9 +42,10 @@ public class TransactionServiceExec implements TransactionService {
         }
     }
 
+
+
     @Override
     public TransactionDto createTransaction(TransactionDto transactionDto) {
-
         transactionDto.setCreatedAt(getCurrentDateTime());
         Transaction transaction = toEntity(transactionDto);
         Transaction transactionResult = repository.save(transaction);
@@ -70,9 +74,16 @@ public class TransactionServiceExec implements TransactionService {
     }
 
     @Override
-    public List<TransactionDto> getTransactionsByAccountId(String accountId) {
-        List<Transaction> transactions = repository.findByAccountId(accountId);
-        return mapper.mapToDto(transactions);
+    public void checkAccountIdforCurrentUser(List<Account> accountList, String accountId) {
+        AtomicInteger count = new AtomicInteger(0);
+        accountList.forEach(singleAccount -> {
+            if (singleAccount.get_id().equals(accountId)){
+                count.getAndIncrement();
+            }
+        });
+        if(count.get() == 0){
+            throw new UserNotAllowedException(UnauthorisedError);
+        }
     }
 //    @Override
 //    public String deleteAllTransaction(String accountId) {
